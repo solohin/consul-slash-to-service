@@ -41,7 +41,7 @@ async function onRequest(client_req, client_res) {
 
     //не надо сокращать путь, если фоллбэк
     const path = (hostPort.host === null || hostPort.port === null)
-        ? client_req
+        ? client_req.url
         : client_req.url.slice(client_req.url.indexOf('/', 1))
 
 
