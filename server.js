@@ -50,7 +50,7 @@ async function onRequest(client_req, client_res) {
     };
 
     var proxy = http.request(options, function (res) {
-        res.setHeader('X-Api-Origin', host.slice(0, -5) + '*'.repeat(5));
+        res.headers['X-Api-Origin'] = host.slice(0, -5) + '*'.repeat(5)
         client_res.writeHead(res.statusCode, res.headers)
         res.pipe(client_res, {
             end: true
