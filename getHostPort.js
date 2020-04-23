@@ -26,8 +26,8 @@ module.exports = async function (serviceName) {
             //не найдено. надо сказать что больше такого сервиса нет и закэшить это
             cache[serviceName] = {
                 expiration: +new Date + config.EXPIRATION_TIMEOUT,
-                host: config.DEFAULT_HOST,
-                port: config.DEFAULT_PORT,
+                host: null,
+                port: null,
             }
         } else {
             console.error(`Ошибка поиска DNS для ${serviceName}. Отдаем из кэша`, e)
@@ -45,8 +45,8 @@ module.exports = async function (serviceName) {
                 //если в кэше ничего, то просто отдадим пустоту и закэшируем этц поустоту
                 cache[serviceName] = {
                     expiration: +new Date + config.ERROR_EXPIRATION_TIMEOUT,
-                    host: config.DEFAULT_HOST,
-                    port: config.DEFAULT_PORT,
+                    host: null,
+                    port: null,
                 }
             }
         }
