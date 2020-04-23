@@ -1,7 +1,7 @@
 const { Resolver } = require('dns').promises;
 const config = require('./config')
 const resolver = new Resolver();
-resolver.setServers(['127.0.0.1:8600']);
+resolver.setServers([config.DNS_SERVER]);
 const cache = {}
 
 module.exports = async function (serviceName) {
