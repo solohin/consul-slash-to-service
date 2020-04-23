@@ -3,9 +3,9 @@ FROM node:10
 # Create app directory
 WORKDIR /usr/src/app
 
-# COPY package*.json ./
+COPY package*.json ./
 
-# RUN npm install
+RUN npm install
 
 # Bundle app source
 COPY . .

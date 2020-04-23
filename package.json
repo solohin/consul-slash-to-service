@@ -1,0 +1,24 @@
+{
+  "name": "consul-slash-to-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "config.js",
+  "dependencies": {
+    "consul": "^0.37.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/solohin/consul-slash-to-service.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/solohin/consul-slash-to-service/issues"
+  },
+  "homepage": "https://github.com/solohin/consul-slash-to-service#readme"
+}

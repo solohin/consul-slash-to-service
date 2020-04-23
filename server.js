@@ -5,6 +5,25 @@ const config = require('./config')
 
 http.createServer(onRequest).listen(config.PORT);
 
+//register in consul
+
+// var consul = require('consul')();
+// consul.agent.service.register({
+//     name: 'slash-router',
+//     id: ('' + (Math.random())).slice(2),
+//     port: config.PORT,
+//     address: config.HOST,
+//     check: {
+//         http: `http://${config.HOST}:${config.PORT}/health`,
+//         interval: '30s',
+//         timeout: '10s',
+//     },
+// }, function (err) {
+//     if (err) {
+//         console.error("Consule error", err)
+//     }
+// });
+
 
 async function onRequest(client_req, client_res) {
     console.log('serve: ' + client_req.url);
