@@ -5,4 +5,6 @@ module.exports = {
     DNS_SERVER: process.env.DNS_SERVER || '127.0.0.1:8600',
     PORT: parseInt(process.env.PORT) || 3000,
     HOST: parseInt(process.env.HOST) || '127.0.0.1',
+    DEFAULT_HOST: process.env.DEFAULT_HOST || null,
+    DEFAULT_PORT: process.env.DEFAULT_PORT || null,
 }
