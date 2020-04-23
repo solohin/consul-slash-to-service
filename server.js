@@ -1,7 +1,10 @@
 var http = require('http');
 const getHostPort = require('./getHostPort')
 const RESPONSE_404 = JSON.stringify({ error: 'Instance not found' })
-http.createServer(onRequest).listen(3000);
+const config = require('./config')
+
+http.createServer(onRequest).listen(config.PORT);
+
 
 async function onRequest(client_req, client_res) {
     console.log('serve: ' + client_req.url);
