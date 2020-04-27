@@ -1,5 +1,6 @@
-VERSION=0.2.8
+VERSION=0.2.9
 
-tag:
+tag:	
+	git add . && git commit -m "${VERSION}"; true
 	git tag ${VERSION}
 	git push --tags
