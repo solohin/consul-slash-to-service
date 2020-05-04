@@ -1,28 +1,12 @@
 var http = require('http');
 const getHostPort = require('./getHostPort')
 const RESPONSE_404 = JSON.stringify({ error: 'Instance not found' })
+const RESPONSE_503 = JSON.stringify({ error: 'Service Unavailable Error' })
 const config = require('./config')
 
 http.createServer(onRequest).listen(config.PORT);
 
 //register in consul
-
-// var consul = require('consul')();
-// consul.agent.service.register({
-//     name: 'slash-router',
-//     id: ('' + (Math.random())).slice(2),
-//     port: config.PORT,
-//     address: config.HOST,
-//     check: {
-//         http: `http://${config.HOST}:${config.PORT}/health`,
-//         interval: '30s',
-//         timeout: '10s',
-//     },
-// }, function (err) {
-//     if (err) {
-//         console.error("Consule error", err)
-//     }
-// });
 
 
 async function onRequest(client_req, client_res) {
@@ -63,7 +47,16 @@ async function onRequest(client_req, client_res) {
     var proxy = http.request(options, function (res) {
         res.headers['X-Api-Origin'] = host.slice(0, -3) + '*'.repeat(3)
         client_res.writeHead(res.statusCode, res.headers)
-        res.pipe(client_res, {
+
+        res.on('error', function (e) {
+            console.error('Pipe ошибка err')
+            //TODO перенаправить на дефолтный
+
+            client_res.writeHead(503, { 'Content-Type': 'text/json' });
+            client_res.write(RESPONSE_503);
+            client_res.end();
+
+        }).pipe(client_res, {
             end: true
         });
     });
@@ -72,3 +65,8 @@ async function onRequest(client_req, client_res) {
         end: true
     });
 }
+
+process.on('uncaughtException', function (err) {
+    console.error("" + err, err.stack);
+    console.log("Поймали uncaughtException");
+});
