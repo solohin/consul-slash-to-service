@@ -1,16 +1,24 @@
 var http = require('http');
 const getHostPort = require('./getHostPort')
-const RESPONSE_404 = JSON.stringify({ error: 'Instance not found' })
-const RESPONSE_503 = JSON.stringify({ error: 'Service Unavailable Error' })
+const uuidv4 = require('uuid').v4
 const config = require('./config')
 
 http.createServer(onRequest).listen(config.PORT);
 
+console.log("Config", config)
 //register in consul
 
 
 async function onRequest(client_req, client_res) {
-    console.log('serve: ' + client_req.url);
+    const requestId = uuidv4()
+    console.log('serve: ' + client_req.url, 'requestId:', requestId);
+
+    if (client_req.url.indexOf('/', 1) === -1) {
+        client_res.writeHead(404, { 'Content-Type': 'text/json' });
+        client_res.write(JSON.stringify({ error: 'Instance not found', requestId }));
+        client_res.end();
+        return
+    }
 
     const instanceName = client_req.url.slice(1, client_req.url.indexOf('/', 1))
     console.log('instanceName', instanceName)
@@ -31,7 +39,7 @@ async function onRequest(client_req, client_res) {
 
     if (host === null || port === null) {
         client_res.writeHead(404, { 'Content-Type': 'text/json' });
-        client_res.write(RESPONSE_404);
+        client_res.write(JSON.stringify({ error: 'Instance not found', requestId }));
         client_res.end();
         return
     }
@@ -44,24 +52,27 @@ async function onRequest(client_req, client_res) {
         headers: client_req.headers
     };
 
-    var proxy = http.request(options, function (res) {
+    var proxyRequest = http.request(options, function (res) {
         res.headers['X-Api-Origin'] = host.slice(0, -3) + '*'.repeat(3)
+        res.headers['X-Api-Requiest-Id'] = requestId
         client_res.writeHead(res.statusCode, res.headers)
 
-        res.on('error', function (e) {
-            console.error('Pipe ошибка err')
-            //TODO перенаправить на дефолтный
-
-            client_res.writeHead(503, { 'Content-Type': 'text/json' });
-            client_res.write(RESPONSE_503);
-            client_res.end();
-
-        }).pipe(client_res, {
+        res.pipe(client_res, {
             end: true
-        });
+        })
     });
 
-    client_req.pipe(proxy, {
+    proxyRequest.on('error', function (e) {
+        console.error('proxyRequest error: ' + e, e)
+        //TODO перенаправить на дефолтный
+
+        client_res.writeHead(503, { 'Content-Type': 'text/json' });
+        client_res.write(JSON.stringify({ error: 'Service Temporary Unavailable Error', requestId }));
+        client_res.end();
+
+    })
+
+    client_req.pipe(proxyRequest, {
         end: true
     });
 }

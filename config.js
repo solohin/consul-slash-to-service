@@ -8,4 +8,3 @@ module.exports = {
     DEFAULT_HOST: process.env.DEFAULT_HOST || null,
     DEFAULT_PORT: process.env.DEFAULT_PORT || null,
 }
-console.log("Config", module.exports)
