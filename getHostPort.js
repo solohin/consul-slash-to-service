@@ -5,7 +5,7 @@ resolver.setServers([config.DNS_SERVER]);
 const cache = {}
 
 module.exports = async function (serviceName) {
-    if (cache[serviceName] && cache[serviceName].expiration < +new Date) {
+    if (cache[serviceName] && cache[serviceName].expiration > +new Date) {
         console.log(`${serviceName}: Результат из кэша`)
         return cache[serviceName]
     } else {
