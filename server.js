@@ -49,7 +49,8 @@ async function onRequest(client_req, client_res) {
         port: port,
         path: path,
         method: client_req.method,
-        headers: client_req.headers
+        headers: client_req.headers,
+        timeout: 120 * 1000
     };
 
     var proxyRequest = http.request(options, function (res) {
