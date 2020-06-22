@@ -8,19 +8,42 @@ http.createServer(onRequest).listen(config.PORT);
 console.log("Config", config)
 //register in consul
 
+// Извлекаем GET-параметры из url
+const extractParams = function(url) {
+    try {
+        let query = url.split('?').pop(),
+            params = query.split('&'),
+            result = {};
+
+        for (let part of params) {
+            let parts = part.split('='),
+                name = parts[0],
+                value = parts[1] || '';
+
+            result[name] = value;
+        }
+        return result;
+    } catch (e) {
+        return {};
+    }
+};
 
 async function onRequest(client_req, client_res) {
     const requestId = uuidv4()
     console.log('serve: ' + client_req.url, 'requestId:', requestId);
-
-    if (client_req.url.indexOf('/', 1) === -1) {
+    let instanceName, params = extractParams(client_req.url);
+    if (client_req.url.indexOf('/', 1) === -1 && !params.instanceId) {
         client_res.writeHead(404, { 'Content-Type': 'text/json' });
         client_res.write(JSON.stringify({ error: 'Instance not found', requestId }));
         client_res.end();
         return
     }
 
-    const instanceName = client_req.url.slice(1, client_req.url.indexOf('/', 1))
+    if (params.instanceId) {
+        instanceName = 'instance' + params.instanceId;
+    } else {
+        instanceName = client_req.url.slice(1, client_req.url.indexOf('/', 1))
+    }
     console.log('instanceName', instanceName)
 
     const hostPort = await getHostPort(instanceName)
@@ -32,9 +55,7 @@ async function onRequest(client_req, client_res) {
     console.log('getHostPort', { host, port })
 
     //не надо сокращать путь, если фоллбэк
-    const path = (hostPort.host === null || hostPort.port === null)
-        ? client_req.url
-        : client_req.url.slice(client_req.url.indexOf('/', 1))
+    let path = client_req.url.replace(instanceName + '/', '')
 
 
     if (host === null || port === null) {
