@@ -55,7 +55,9 @@ async function onRequest(client_req, client_res) {
     console.log('getHostPort', { host, port })
 
     //не надо сокращать путь, если фоллбэк
-    let path = client_req.url.replace(instanceName + '/', '')
+    let path = (hostPort.host === null || hostPort.port === null)
+        ? client_req.url
+        : client_req.url.replace(instanceName + '/', '')
 
 
     if (host === null || port === null) {
