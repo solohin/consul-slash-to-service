@@ -58,6 +58,18 @@ module.exports = async function (serviceName) {
     return cache[serviceName]
 }
 
+setInterval(() => {
+    let keys = [];
+    for (let key of Object.keys(cache)) {
+        if (cache[key] && cache[key].expiration && cache[key].expiration < Date.now()) {
+            keys.push(key);
+        }
+    }
+    for (let key of keys) {
+        delete cache[key];
+    }
+}, 60 * 1000);
+
 const resolveHost = async function (host) {
     const record = await resolver.resolve(host)
     return record[0]

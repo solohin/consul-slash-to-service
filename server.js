@@ -46,6 +46,13 @@ async function onRequest(client_req, client_res) {
     }
     console.log('instanceName', instanceName)
 
+    if (instanceName.indexOf('instance') !== 0) {
+        client_res.writeHead(404, { 'Content-Type': 'text/json' });
+        client_res.write(JSON.stringify({ error: 'Instance not found', requestId }));
+        client_res.end();
+        return
+    }
+
     const hostPort = await getHostPort(instanceName)
 
     //подставим фоллбэк
