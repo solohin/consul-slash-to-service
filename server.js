@@ -1,9 +1,12 @@
 var http = require('http');
+const httpProxy = require('http-proxy');
 const getHostPort = require('./getHostPort')
+const getWssHostPort = require('./getWssHostPort')
 const uuidv4 = require('uuid').v4
 const config = require('./config')
 
-http.createServer(onRequest).listen(config.PORT);
+
+const proxyServer = http.createServer(onRequest).listen(config.PORT);
 
 console.log("Config", config)
 //register in consul
@@ -111,4 +114,26 @@ async function onRequest(client_req, client_res) {
 process.on('uncaughtException', function (err) {
     console.error("" + err, err.stack);
     console.log("Поймали uncaughtException");
+});
+
+proxyServer.on('upgrade', async function (req, socket, head) {
+    let instanceId;
+    if (req.url.match(/^\/instance\d+/)) {
+        instanceId = req.url.replace('/instance', '');
+    }
+
+    if (!instanceId) {
+        return;
+    }
+
+    let data = await getWssHostPort(instanceId);
+    if (!data) {
+        return;
+    }
+
+    let proxy = new httpProxy.createProxyServer({
+        target: data
+    });
+
+    proxy.ws(req, socket, head);
 });
