@@ -13,7 +13,9 @@ module.exports = async function (serviceName) {
     }
 
     try {
-        const [srvRecord] = await resolver.resolveSrv(`${serviceName}.service.${config.DC}.consul`)
+        const srvRecords = await resolver.resolveSrv(`${serviceName}.service.${config.DC}.consul`)
+
+        const srvRecord = srvRecords.filter(rec => !rec.name.startsWith('5fd95758'))[0]
         const host = await resolveHost(srvRecord.name)
         console.log(`${serviceName}: resolved to `, {
             host: host,
