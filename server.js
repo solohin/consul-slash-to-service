@@ -125,7 +125,7 @@ proxyServer.on('upgrade', async function (req, socket, head) {
         return;
     }
 
-    let data = await getHostPort(instanceId + '-mqtt');
+    let data = await getHostPort(`instance${instanceId}-mqtt`);
     if (!data) {
         return;
     }
