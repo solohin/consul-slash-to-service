@@ -1,7 +1,6 @@
 var http = require('http');
 const httpProxy = require('http-proxy');
 const getHostPort = require('./getHostPort')
-const getWssHostPort = require('./getWssHostPort')
 const uuidv4 = require('uuid').v4
 const config = require('./config')
 
@@ -126,7 +125,7 @@ proxyServer.on('upgrade', async function (req, socket, head) {
         return;
     }
 
-    let data = await getWssHostPort(instanceId);
+    let data = await getHostPort(instanceId + '-mqtt');
     if (!data) {
         return;
     }

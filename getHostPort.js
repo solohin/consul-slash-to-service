@@ -13,19 +13,15 @@ module.exports = async function (serviceName) {
     }
 
     try {
-        const srvRecords = await resolver.resolveSrv(`${serviceName}.service.${config.DC}.consul`)
+        const portResolve = await resolver.resolveSrv(`${serviceName}.service.${config.DC}.consul`);
+        const hostResolve = await resolver.resolveAny(`${serviceName}.service.${config.DC}.consul`);
 
-        const srvRecord = srvRecords.filter(rec => !rec.name.startsWith('5fd95758'))[0]
-        const host = await resolveHost(srvRecord.name)
-        console.log(`${serviceName}: resolved to `, {
-            host: host,
-            port: srvRecord.port
-        })
-        cache[serviceName] = {
-            expiration: +new Date + config.EXPIRATION_TIMEOUT,
-            host: host,
-            port: srvRecord.port,
-        }
+        let result = {
+            host: hostResolve.filter(rec => !rec.name.startsWith('5fd95758'))[0].address,
+            port: portResolve.filter(rec => !rec.name.startsWith('5fd95758'))[0].port
+        };
+        console.log(`${serviceName}: resolved to `, result);
+        cache[serviceName] = Object.assign({ expiration: +new Date + config.EXPIRATION_TIMEOUT }, result);
     } catch (e) {
         if (e.code === 'ENOTFOUND') {
             //не найдено. надо сказать что больше такого сервиса нет и закэшить это
