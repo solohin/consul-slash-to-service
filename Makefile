@@ -1,4 +1,4 @@
-VERSION=0.2.21
+VERSION=0.2.24
 
 tag:	
 	git add . && git commit -m "${VERSION}"; true
