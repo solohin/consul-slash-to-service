@@ -17,7 +17,7 @@ module.exports = async function (serviceName) {
         const hostResolve = await resolver.resolveAny(`${serviceName}.service.${config.DC}.consul`);
 
         let result = {
-            host: hostResolve.filter(rec => !rec.name.startsWith('5fd95758'))[0].address,
+            host: hostResolve[0].address,
             port: portResolve.filter(rec => !rec.name.startsWith('5fd95758'))[0].port
         };
         console.log(`${serviceName}: resolved to `, result);
