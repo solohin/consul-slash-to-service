@@ -87,7 +87,8 @@ async function onRequest(client_req, client_res) {
 
     var proxyRequest = http.request(options, function (res) {
         res.headers['X-Api-Origin'] = host.slice(0, -3) + '*'.repeat(3)
-        res.headers['X-Api-Requiest-Id'] = requestId
+        res.headers['X-Api-Request-Id'] = requestId
+        res.headers['X-Api-Instance-Id'] = instanceName
         client_res.writeHead(res.statusCode, res.headers)
 
         res.pipe(client_res, {
