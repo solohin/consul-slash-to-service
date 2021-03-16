@@ -81,14 +81,13 @@ async function onRequest(client_req, client_res) {
         port: port,
         path: path,
         method: client_req.method,
-        headers: client_req.headers,
+        headers: Object.assign({'X-Api-Instance-Id': instanceName}, client_req.headers),
         timeout: 120 * 1000
     };
 
     var proxyRequest = http.request(options, function (res) {
         res.headers['X-Api-Origin'] = host.slice(0, -3) + '*'.repeat(3)
         res.headers['X-Api-Request-Id'] = requestId
-        res.headers['X-Api-Instance-Id'] = instanceName
         client_res.writeHead(res.statusCode, res.headers)
 
         res.pipe(client_res, {
