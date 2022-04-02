@@ -33,8 +33,9 @@ const extractParams = function(url) {
 async function onRequest(client_req, client_res) {
     const requestId = uuidv4()
     console.log('serve: ' + client_req.url, 'requestId:', requestId);
-    let instanceName, params = extractParams(client_req.url);
-    if (client_req.url.indexOf('/', 1) === -1 && !params.instanceId) {
+    let instanceName, params = extractParams(client_req.url),
+        useAlternative = false, alternativeToken = client_req.headers['authorization'] || params.token; // Alternative token-only authorization
+    if (client_req.url.indexOf('/', 1) === -1 && !params.instanceId && !alternativeToken) {
         client_res.writeHead(404, { 'Content-Type': 'text/json' });
         client_res.write(JSON.stringify({ error: 'Instance not found', requestId }));
         client_res.end();
@@ -46,9 +47,13 @@ async function onRequest(client_req, client_res) {
     } else {
         instanceName = client_req.url.slice(1, client_req.url.indexOf('/', 1))
     }
+    if (!instanceName.match(/instance\d+/) && alternativeToken) {
+        instanceName = alternativeToken;
+        useAlternative = true;
+    }
     console.log('instanceName', instanceName)
 
-    if (instanceName.indexOf('instance') !== 0) {
+    if (instanceName.indexOf('instance') !== 0 && !useAlternative) {
         client_res.writeHead(404, { 'Content-Type': 'text/json' });
         client_res.write(JSON.stringify({ error: 'Instance not found', requestId }));
         client_res.end();
